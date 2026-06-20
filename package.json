@@ -1,0 +1,13 @@
+{
+  "name": "face-it",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Clawpilot visual frontend QA skill and helper scripts.",
+  "type": "module",
+  "scripts": {
+    "doctor": "node scripts/face-it-doctor.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.53.1"
+  }
+}

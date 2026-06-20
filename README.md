@@ -88,6 +88,26 @@ Remaining:
 - None
 ```
 
+## Face-It Doctor
+
+Face-It includes a lightweight helper for HTML files and local URLs:
+
+```powershell
+npm install
+npm run doctor -- .\artifact.html --surface dashboard
+npm run doctor -- http://127.0.0.1:3000 --surface app-home
+```
+
+The doctor helper:
+
+- scans standalone HTML for Clawpilot theme markers
+- flags hardcoded non-theme colors
+- checks expected typography and dark-mode markers
+- captures desktop and narrow screenshots when Playwright is installed
+- prints a scorecard stub for visual review
+
+Screenshots are written to `face-it-output/`.
+
 ## References
 
 - [Visual QA Checklist](references/VISUAL_QA_CHECKLIST.md)

@@ -39,3 +39,14 @@ Select-String -Path .\artifact.html -Pattern '#[0-9a-fA-F]{3,8}|rgb\(|hsl\(' -Al
 ```
 
 For Clawpilot artifacts, allowed colors should come from the required `--cp-*` variables.
+
+## Face-It Doctor
+
+Use the packaged helper for the standard first-pass check:
+
+```powershell
+npm run doctor -- .\artifact.html --surface dashboard
+npm run doctor -- http://127.0.0.1:3000 --surface app-home
+```
+
+It emits a report, screenshots, console errors, and a scorecard stub.
