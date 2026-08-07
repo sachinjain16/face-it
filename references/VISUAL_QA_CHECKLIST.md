@@ -58,8 +58,21 @@ Score each category from 1 to 5:
 - theme/contrast
 - readiness
 - fit (matches the design read and surface profile)
+- accessibility (when the a11y-lite pass ran)
 
 Average the score. Anything below 4 needs a fix or an explicit limitation.
+
+## Accessibility-lite pass
+
+Visible-layer only; not a full audit. Mandatory for consumer/kids and trust-first profiles, recommended otherwise. Checks: text contrast (target 4.5:1 body, 3:1 large), visible focus indicator on tab, target size (target 44x44 CSS px on narrow), non-empty accessible names on images and icon-only buttons, body text not below ~12px, state not signaled by color alone. Report measured values. Label `a11y`.
+
+## State matrix
+
+For stateful surfaces (forms, drawers, modals, tables, cards, charts, preview panes, lists): attempt empty, loading, error, populated, selected/active, hover/focus, disabled. Trigger via Storybook/route, UI interaction, or a network mock; otherwise mark un-inspected. Never edit app code to force a state. Capture `face-it-<surface>-state-<state>.png` and report each state as pass / fix / un-inspected. Label `state`.
+
+## Reference compare
+
+Judgment-assist, not pixel-diff; no similarity percentage. When a reference (screenshot, image path, URL, or prior version) is given, capture the target at the reference viewport, place side by side, and report divergences in structure, spacing rhythm, type scale, accent, and register. Note responsive/theme adaptations as intentional. Capture `face-it-<surface>-vs-reference.png`; feeds the `fit` score. Label `ref`.
 
 ## Issue taxonomy
 
@@ -78,10 +91,12 @@ Use these labels:
 - `console`
 - `default`
 - `fit`
+- `a11y`
+- `ref`
 
 ## Pre-flight self-audit
 
-Before declaring a pass, confirm: design read stated and matched; anti-default scan ran; motion motivated; one accent and one theme held; real content and previews; copy read once for AI-sounding filler; density or warmth appropriate to the profile; before/after evidence captured and re-scored.
+Before declaring a pass, confirm: design read stated and matched; anti-default scan ran; motion motivated; one accent and one theme held; real content and previews; copy read once for AI-sounding filler; density or warmth appropriate to the profile; accessibility-lite pass ran where required (or skip stated); stateful surfaces had states captured or marked un-inspected; any provided reference compared and divergences resolved; before/after evidence captured and re-scored.
 
 ## Screenshot naming
 
@@ -90,6 +105,8 @@ Use:
 ```text
 face-it-<surface>-before.png
 face-it-<surface>-after.png
+face-it-<surface>-state-<state>.png
+face-it-<surface>-vs-reference.png
 ```
 
 Examples:
@@ -97,6 +114,7 @@ Examples:
 ```text
 face-it-dashboard-before.png
 face-it-dashboard-after.png
-face-it-mark-it-down-before.png
-face-it-mark-it-down-after.png
+face-it-dashboard-state-empty.png
+face-it-dashboard-state-error.png
+face-it-landing-vs-reference.png
 ```

@@ -96,6 +96,46 @@ Beyond mechanical defects, scan for signs the UI defaulted to generic AI output 
 - Register mismatch — a cold clinical layout for a warm consumer/kid surface, or playful ornament on a trust-first surface.
 - One-accent and one-theme discipline broken: an accent that drifts across the page, or a section that flips light/dark mid-scroll without intent.
 
+## Accessibility-lite pass
+
+A visible-layer accessibility check. It catches renderable defects only and does not replace a full accessibility audit (screen-reader flows, deep ARIA semantics, keyboard-trap analysis). Say so when a11y comes up.
+
+Gating: mandatory for consumer product (including kids/family) and trust-first/regulated profiles; recommended for all others. Skip only when the user asks for visual-only, and note the skip.
+
+Checks, all from the rendered page:
+- Text contrast meets a threshold (target 4.5:1 body, 3:1 for large text). Report the measured ratio and the failing element.
+- Interactive elements show a visible focus indicator when tabbed to.
+- Touch/click targets meet a minimum size (target 44x44 CSS px) on the narrow viewport.
+- Images and icon-only buttons have a non-empty accessible name (alt text or aria-label).
+- Body text is not below a legibility floor (flag under about 12px).
+- State is not signaled by color alone (error/success also carries text or icon).
+
+How to run: reuse the Playwright path. Read resolved foreground/background colors and compute contrast; read the accessibility tree for names; tab through a sample of interactive elements and screenshot the focused state.
+
+Output: label `a11y:`, score category `accessibility` (1-5, folded into the average). Include the measured value where relevant, e.g. `a11y: contrast 2.8:1 on muted caption over card. Darken text to meet 4.5:1.`
+
+## State matrix
+
+Capture and inspect the non-happy states of stateful surfaces. Only states reachable from the running UI or a documented prop/route are captured; unreachable states are listed as un-inspected, never fabricated. Never edit app code to force a state; drive the UI or mock at the network boundary only.
+
+Applies to: forms, drawers, modals, tables, cards, charts, preview panes, lists. Skip for purely static content.
+
+States to attempt per surface: empty, loading, error, populated, selected/active, hover/focus, disabled.
+
+How to trigger, in priority order: (1) a Storybook story or route/query param if one exists; (2) UI interaction (submit empty form, clear filters to force empty, hover/tab for interactive states); (3) a short-lived network mock via the browser context to force loading and error; (4) otherwise mark the state un-inspected.
+
+Output: screenshots named `face-it-<surface>-state-<state>.png` and a small table listing each state as pass / fix / un-inspected. Findings use the `state:` label. A broken state lowers the `readiness` score.
+
+## Reference compare
+
+A judgment-assist compare against a provided reference, not a pixel-diff gate. It reports meaningful divergences (layout structure, spacing rhythm, type scale, color/accent, register) and never treats a legitimate responsive or theme adaptation as a defect. Do not emit a similarity percentage; that would be a fabricated number.
+
+Fires when the user provides a reference: a pasted screenshot, an image path, a URL to emulate, or "match the previous version." Also usable as an after-vs-before self-compare to confirm a fix did not regress unrelated regions.
+
+How to run: capture the target at the reference's viewport and aspect. If the reference is a URL, render it through the same Playwright path at the same viewport for a fair compare. Place reference and render side by side and assess against the design read: structural hierarchy, spacing family, type scale, accent, and register. Call out specific, actionable divergences.
+
+Output: label `ref:`, a side-by-side capture named `face-it-<surface>-vs-reference.png`. Findings feed the `fit` score; a large unjustified divergence from an explicit reference lowers `fit`. Note responsive and theme adaptations as intentional rather than flagging them.
+
 ## Workflow
 
 1. Identify the render target.
@@ -128,6 +168,9 @@ Beyond mechanical defects, scan for signs the UI defaulted to generic AI output 
    - Clawpilot theme variables for artifacts
    - anti-default scan against the surface profile (see Anti-default scan)
    - register fit: does the rendered result match the design read's expected register
+   - accessibility-lite pass, gated by profile (see Accessibility-lite pass)
+   - state matrix for stateful surfaces (see State matrix)
+   - reference compare when a reference was provided (see Reference compare)
 
 5. Score the result.
    Score each category 1-5:
@@ -137,6 +180,7 @@ Beyond mechanical defects, scan for signs the UI defaulted to generic AI output 
    - theme/contrast
    - readiness
    - fit (matches the design read and surface profile)
+   - accessibility (contrast, focus, target size, names) when the a11y-lite pass ran
 
    Overall score is the average. Scores below 4 need a fix or an explicit limitation.
 
@@ -167,6 +211,8 @@ Use these labels for findings:
 - `console:` visible UI issue caused by runtime/browser errors
 - `default:` generic AI-default look or register mismatch against the surface profile
 - `fit:` result does not match the stated design read (wrong density, motion, or register)
+- `a11y:` visible accessibility defect (contrast, focus, target size, missing name, color-only signal)
+- `ref:` diverges from a provided reference in a way not explained by responsive or theme adaptation
 
 ## Review output
 
@@ -194,6 +240,10 @@ Design read: <surface kind> for <audience>, register <register>
 Screenshots:
 - face-it-<surface>-before.png
 - face-it-<surface>-after.png
+- face-it-<surface>-state-<state>.png (per captured state, when a state matrix ran)
+- face-it-<surface>-vs-reference.png (when a reference compare ran)
+
+States: <state: pass|fix|un-inspected, per state> (omit when no state matrix ran)
 
 Fixed:
 - <tag>: <visual issue fixed>
@@ -277,6 +327,9 @@ Run this gate before declaring a Face-It pass. Answer each item; if any fails, f
 - Real content and real previews — no fake chrome, no fabricated-precise numbers presented as real.
 - Visible copy read once for broken grammar, unclear referents, or AI-sounding filler.
 - For dense surfaces, density serves scan-ability; for consumer/kid surfaces, warmth and clarity are present, not stripped.
+- Accessibility-lite pass ran where the profile requires it, or was explicitly skipped with a reason; contrast, focus, and target-size failures are fixed or listed.
+- For stateful surfaces, each applicable state was captured or marked un-inspected, and broken states are fixed or listed.
+- When a reference was provided, the render was compared against it and material divergences are fixed or listed, with responsive/theme adaptations noted as intentional.
 - Before/after evidence captured (or the render blocker stated), and the surface re-scored after fixes.
 
 ## Exit criteria
@@ -284,6 +337,9 @@ Run this gate before declaring a Face-It pass. Answer each item; if any fails, f
 A Face-It task is done when:
 - the relevant UI rendered successfully, or the render blocker is clearly stated
 - screenshots or equivalent rendered evidence were captured when feasible
+- the accessibility-lite pass ran where the profile requires it, or the skip is stated
+- stateful surfaces had their states captured or marked un-inspected
+- a provided reference was compared against and divergences fixed or listed
 - visible issues were fixed or explicitly listed
 - the final state was rechecked
 - the response names the meaningful visual outcome, not the tool mechanics

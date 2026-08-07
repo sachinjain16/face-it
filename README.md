@@ -36,12 +36,13 @@ Restart Clawpilot, then verify the skill appears as:
 
 Face-It standardizes the frontend review loop:
 
-1. Render the target UI.
-2. Capture a before screenshot.
+1. State a one-line design read and pick a surface profile (operator dashboard through consumer/kids app).
+2. Render the target UI and capture a before screenshot.
 3. Inspect layout, spacing, theme, contrast, overflow, responsiveness, and state quality.
-4. Fix visible defects.
-5. Capture an after screenshot.
-6. Report score, fixes, and any remaining limitations.
+4. Scan for generic AI-default tells scoped to the profile.
+5. Run an accessibility-lite pass, a state matrix for stateful surfaces, and a reference compare when a reference is provided.
+6. Fix visible defects and capture an after screenshot.
+7. Clear the pre-flight self-audit, then report score, fixes, and any remaining limitations.
 
 ## When to use
 

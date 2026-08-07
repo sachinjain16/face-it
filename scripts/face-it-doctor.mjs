@@ -28,6 +28,8 @@ const result = {
     responsiveness: null,
     themeContrast: null,
     readiness: null,
+    fit: null,
+    accessibility: null,
   },
 };
 
